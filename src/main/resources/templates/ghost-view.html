@@ -1,0 +1,164 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Ghost Game</title>
+	<link href="webjars/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+	<script src="webjars/jquery/3.3.1/jquery.min.js"></script>
+	<script src="webjars/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+	<div class="container">
+		<div id="myAlert"
+			class="alert alert-danger alert-dismissible collapse" 
+			role="alert">
+			<button type="button" class="close" data-dismiss="alert"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+
+		<div id="myAlert_fail"
+			 class="alert alert-danger alert-dismissible collapse" 
+			 role="alert"
+			 th:text="${message}">
+			<button type="button" class="close" data-dismiss="alert"
+				aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<img src="ghostImage.png" class="rounded float-left" height="42" width="42">
+			</div>
+			<div class="col">
+				<h4 th:text="#{ghost.title}">Ghost game</h4>
+			</div>
+			<div class="col">
+				<h4 th:text="#{ghost.scores}">Scores:</h4>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<form method="POST" action="/ghost">
+					<div class="form-group">
+						<div class="input-group mb-3">
+							<div class="input-group-prepend">
+								<span class="input-group-text" th:text="#{ghost.enterLetter}">Enter a letter:</span>
+							</div>
+							<input type="text" 
+							       class="form-control text-uppercase" 
+							       id="letter"
+							       name="letter"
+								   maxlength="1" 
+								   required="true"
+								   pattern="[A-Za-z]"
+								   title="The word should only contain letters. e.g. house"
+								   aria-describedby="smallMessage">
+							<small id="smallMessage" 
+							       class="form-text text-muted"
+							       th:text="#{ghost.beatOpponent}">Try to beat your opponent!</small>
+						</div>
+					</div>
+					<button id="addLetterBtn" 
+					        type="submit" 
+					        class="btn btn-primary"
+					        th:text="#{ghost.addLetterBtn}">Add letter</button>
+				</form>
+				<button id="newWordBtn" 
+				        onclick="location.href='/ghost/newRound';" 
+				        type="button" 
+				        style="display: none;"
+				        class="btn btn-warning"
+				        th:text="#{ghost.newWordBtn}">New word!</button>
+				<button id="newGameBtn" 
+				        onclick="location.href='/ghost/newGame';" 
+				        type="button" 
+				        style="display: none;"
+				        class="btn btn-warning"
+				        th:text="#{ghost.playAgainBtn}">Play again</button>
+			</div>
+			<div class="col">
+				<div class="input-group mb-3">
+					<div class="input-group-prepend">
+						<span class="input-group-text"
+						      th:text="#{ghost.word}">Word:</span>
+					</div>
+					<input type="text" 
+					       th:attr="value=${wordFragment}"
+					       class="form-control text-uppercase" readonly>
+				</div>
+			</div>
+			<div class="col">
+				<div class="input-group mb-3">
+					<div class="input-group-prepend">
+						<span class="input-group-text"					
+						  	  th:text="#{ghost.player}">Player:</span>
+					</div>
+					<input type="text" 
+					       id="p1Score"
+					       name="p1Score"
+					       th:attr="value=${p1Score}"
+					       class="form-control" readonly>
+					<div class="input-group-prepend">
+						<span class="input-group-text"
+					     	  th:text="#{ghost.machine}">Machine:</span>
+					</div>
+					<input type="text" 
+						   id="p2Score"
+					       name="p2Score"
+					       th:attr="value=${p2Score}"
+					       class="form-control" readonly>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		
+		// If any player reaches 5 points, the game ends
+		function checkWinner() {
+			
+			let winner = false;
+			
+			if ($('#p1Score').val() == 5) {
+				$('#myAlert').text("Machine player wins the game!");
+				winner = true;
+			}
+			if ($('#p2Score').val() == 5) {
+				$('#myAlert').text("Human player wins the game!");
+				winner = true;
+			}
+
+			if (winner){
+				$('#myAlert').show('fade');
+				$("#newGameBtn").show();
+				$("#newWordBtn").hide();
+				$("#addLetterBtn").hide();  
+				$("#letter").prop('disabled', true);
+			}
+			
+		}
+	
+		$(document).ready(function() {
+			
+			// If we have a message, we show it
+			if ($('#myAlert_fail').text() != "") {
+				$('#myAlert_fail').show('fade');
+				$("#newWordBtn").show();
+				$("#addLetterBtn").hide();  
+				$("#letter").prop('disabled', true);
+			}
+			
+			$('#letter').focus();
+			
+			checkWinner();
+
+		});
+	</script>
+</body>
+</html>
